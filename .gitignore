@@ -35,8 +35,8 @@ Temporary Items
 *~
 *.sublime-workspace
 
-# Claude Code: personal settings stay local; shared launch.json is committed
-.claude/settings.local.json
+# Claude Code config (local preview server, settings): not part of the app
+.claude/
 
 # ---------------------------------------------------------------------------
 # Static web project tooling (no build step today, but common add-ons)
