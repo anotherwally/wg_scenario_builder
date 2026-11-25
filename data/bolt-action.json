@@ -1,0 +1,457 @@
+{
+  "schemaVersion": 1,
+  "id": "bolt-action",
+  "name": "Bolt Action",
+  "shortName": "BA",
+  "edition": "Third Edition",
+  "status": "review",
+  "statusNote": "Rules paraphrased from the Bolt Action Third Edition rulebook (pp. 162–174). Read them through, then set \"status\" to \"verified\" in data/bolt-action.json to hide this notice.",
+  "source": {
+    "book": "Bolt Action Third Edition rulebook",
+    "pages": "162–174"
+  },
+  "table": { "width": 72, "height": 48, "label": "6' × 4' table" },
+  "game": {
+    "turns": 6,
+    "extraTurn": {
+      "die": 6,
+      "on": 4,
+      "turns": 1,
+      "summary": "End of turn 6: roll a die. On 1–3 the game ends, on 4+ play turn 7."
+    }
+  },
+  "categories": [
+    {
+      "id": "victory",
+      "name": "Victory Conditions",
+      "shortName": "Victory",
+      "icon": "target",
+      "die": 6,
+      "prompt": "Pick the victory conditions or roll a D6.",
+      "options": [
+        {
+          "id": "seek-and-destroy",
+          "name": "Seek and Destroy",
+          "roll": [1],
+          "page": 164,
+          "summary": "Destroy as much of the enemy as you can. Score 1 VP per enemy unit destroyed. You need a lead of 2 VP or more to win; anything less is a draw.",
+          "full": [
+            "Both forces aim to inflict the heaviest losses they can while keeping their own troops alive.",
+            "## Scoring",
+            "- **1 VP** for each enemy unit destroyed.",
+            "## Winning",
+            "- Add up VP at the end of the game. A side with **at least 2 VP more** than the other wins a clear victory.",
+            "- Any smaller margin is a draw."
+          ],
+          "winMargin": 2,
+          "scoring": [
+            { "label": "Enemy unit destroyed", "points": 1 }
+          ]
+        },
+        {
+          "id": "key-positions",
+          "name": "Key Positions",
+          "roll": [2],
+          "page": 164,
+          "summary": "D3+4 objectives go on the table. Capture them with infantry or artillery. Whoever controls more of them at the end wins. Otherwise it's a draw.",
+          "full": [
+            "A string of positions vital to the campaign must be taken. Both sides try to capture as many as they can.",
+            "## Placing objectives",
+            "- One player rolls D3+4. That is the number of objective markers (25mm round tokens) in play.",
+            "- Both players roll a die. The higher roller places the first marker anywhere on the table, then the players take turns until all markers are placed.",
+            "- Every marker must be more than 12\" from every other marker and more than 6\" from any table edge.",
+            "- Buildings or other scenery can stand in for markers. Agree beforehand how each one affects line of sight, movement and cover.",
+            "## Capturing",
+            "- To capture an objective, one of your infantry or artillery units must end its activation within 3\" of it, with no enemy unit of any type within 3\".",
+            "- Mark each captured objective as yours (a flag works well). It stays yours until the end of the game, or until the enemy captures it back the same way.",
+            "## Winning",
+            "- At the end of the game, the player who controls more objectives wins. Any other result is a draw."
+          ],
+          "scoreUnit": "Obj",
+          "winMargin": 1,
+          "scoring": [
+            { "label": "Objective captured", "points": 1 },
+            { "label": "Objective lost", "points": -1 }
+          ]
+        },
+        {
+          "id": "breakthrough",
+          "name": "Breakthrough",
+          "roll": [3],
+          "page": 165,
+          "summary": "Get units off the table across the enemy's deployment zone edge (3 VP each) or into the enemy zone (1 VP each). No reserves allowed. You need a lead of 2 VP or more to win.",
+          "full": [
+            "Both sides try to break through the enemy line, or at least push troops into the enemy deployment zone.",
+            "## Special rules",
+            "- Units may deliberately leave the table across the enemy's deployment zone edge (DZE). The unit needs a successful Advance or Run order, and every model in it must move into contact with the enemy DZE.",
+            "- No units may be held in reserve. If you roll Fog of War for the deployment type, re-roll until you get something else.",
+            "## Scoring",
+            "- **3 VP** for each of your units that left the table across the enemy DZE before the game ended.",
+            "- **1 VP** for each of your units completely inside the enemy deployment zone at the end of the game.",
+            "## Winning",
+            "- A side with **at least 2 VP more** than the other wins a clear victory. Any smaller margin is a draw."
+          ],
+          "winMargin": 2,
+          "excludes": ["fog-of-war"],
+          "scoring": [
+            { "label": "Unit moved off enemy DZE", "points": 3 },
+            { "label": "Unit in enemy zone at end", "points": 1 }
+          ]
+        },
+        {
+          "id": "top-secret",
+          "name": "Top Secret",
+          "roll": [4],
+          "page": 165,
+          "summary": "A briefcase of secret documents lies in the centre of the table. Grab it with infantry and carry it off your own table edge to win at once. If nobody does, it's a draw.",
+          "full": [
+            "A transport plane has come down between the lines. Aboard was a staff officer's briefcase full of secret documents, and neither side can let the other get it.",
+            "## Set-up",
+            "- Place the briefcase marker (25mm round) in the centre of the table. A crate, a parachute or an officer model can stand in for it.",
+            "- The marker counts as impassable terrain, but it doesn't block line of sight or give cover.",
+            "- All units, infiltrators included, must deploy more than 12\" from the briefcase (or from the building it's in). Nobody can reach it on turn 1 except troops dropped off by a transport that has driven close enough.",
+            "## Seizing the briefcase",
+            "- An infantry unit seizes the briefcase by taking an Advance or Run order and ending its move with a model touching the marker (or occupying the building section it's in). That model carries it from then on.",
+            "- If the carrier is killed, pass the briefcase to another model in the same unit. If the whole unit is destroyed or removed, the briefcase stays where it was for anyone to pick up.",
+            "- If the carrying unit is wiped out in an assault, the winning enemy unit can take the briefcase at once and place it next to one of its models before regrouping.",
+            "- If the briefcase ends up in impassable terrain (a burning building, for example), units pick it up by moving into contact with that terrain.",
+            "## Winning",
+            "- The carrying unit may deliberately leave the table across its own deployment zone edge (DZE). It needs a successful Advance or Run order, and every model must move into contact with that edge.",
+            "- If a unit carries the briefcase off the table, the game ends immediately and that player wins. Otherwise the game is a draw."
+          ],
+          "markers": [
+            { "x": 36, "y": 24, "label": "Briefcase", "ring": 12 }
+          ],
+          "winMargin": 1,
+          "scoring": [
+            { "label": "Briefcase carried off table (wins)", "points": 1, "endsGame": true }
+          ]
+        },
+        {
+          "id": "demolition",
+          "name": "Demolition",
+          "roll": [5],
+          "page": 166,
+          "summary": "Each side has a base in its own zone. At the end of each turn, roll for every infantry or artillery unit within 3\" of the enemy base; a 4+ destroys it. The first to destroy the enemy base wins.",
+          "full": [
+            "Recon has found the enemy headquarters. Attack it in strength, but leave enough troops behind to defend your own.",
+            "## Set-up",
+            "- Once the deployment zones and deployment type are decided, roll off. The loser places their base in their own deployment zone, no more than 20\" from the table middle line. Then the winner places theirs the same way.",
+            "- Bases are 25mm round markers, or a model such as a tent, dug-out, command vehicle, building, fuel dump or radio mast. Agree beforehand how it affects line of sight, movement and cover.",
+            "- All units, infiltrators included, must deploy more than 18\" from the enemy base.",
+            "## Destroying a base",
+            "- At the end of every game turn, roll a die for each of your infantry or artillery units that is within 3\" of the enemy base and isn't Down. Enemy units nearby don't stop this.",
+            "- On a **4+** the base is destroyed.",
+            "## Winning",
+            "- If a base is destroyed at the end of a turn, the game ends immediately.",
+            "- If you destroyed the enemy base and yours still stands, you win. If both bases fall at the end of the same turn, it's a draw."
+          ],
+          "winMargin": 1,
+          "scoring": [
+            { "label": "Enemy base destroyed (wins)", "points": 1, "endsGame": true }
+          ]
+        },
+        {
+          "id": "hold-until-relieved",
+          "name": "Hold Until Relieved",
+          "roll": [6],
+          "page": 167,
+          "summary": "One strategic objective sits in the centre of the table. Control it with infantry or artillery at the end of the game to win. If neither side controls it, it's a draw.",
+          "full": [
+            "Both forces reached a key strategic position during the night. At first light they must take it, dig in and hold out until relief arrives.",
+            "## Set-up",
+            "- Place one objective marker in the centre of the table. It might be a bridge, a supply dump, an airstrip, a command bunker or a V2 launch site.",
+            "- If you use scenery instead of a marker, agree its rules the same way as for Demolition bases.",
+            "## Control",
+            "- You control the objective when one of your infantry or artillery units ends its activation within 3\" of it and no enemy unit of any type is within 3\".",
+            "## Winning",
+            "- Whoever controls the objective at the end of the game wins. If neither side controls it, it's a draw."
+          ],
+          "markers": [
+            { "x": 36, "y": 24, "label": "Objective" }
+          ],
+          "scoreUnit": "Obj",
+          "winMargin": 1,
+          "scoring": [
+            { "label": "Took the objective", "points": 1 },
+            { "label": "Lost the objective", "points": -1 }
+          ]
+        },
+        {
+          "id": "grand-tactical",
+          "name": "Grand Tactical (veteran)",
+          "page": 167,
+          "summary": "All six victory conditions apply at once and are scored in VP. The game doesn't end early, and reserves may outflank. You need a lead of 2 VP or more to win. Chosen by agreement, never rolled.",
+          "full": [
+            "A harder test of generalship for experienced players. Pick it by agreement; it isn't on the D6 table.",
+            "## Set-up",
+            "- Set up every victory condition from 1 to 6. All of them apply.",
+            "- The game doesn't end when a base is destroyed or the briefcase leaves the table, and reserves are allowed to outflank.",
+            "## Scoring",
+            "- **1 VP** per enemy unit destroyed.",
+            "- **1 VP** per friendly unit in the enemy deployment zone.",
+            "- **3 VP** per friendly unit that moved off the enemy DZE.",
+            "- **3 VP** per objective controlled (not counting the central strategic objective).",
+            "- **5 VP** for retrieving the Top Secret briefcase.",
+            "- **5 VP** if the enemy base is destroyed.",
+            "- **5 VP** for controlling the central strategic objective.",
+            "## Winning",
+            "- A side with **at least 2 VP more** than the other wins a clear victory. Otherwise it's a draw."
+          ],
+          "winMargin": 2,
+          "scoring": [
+            { "label": "Enemy unit destroyed", "points": 1 },
+            { "label": "Unit in enemy zone at end", "points": 1 },
+            { "label": "Unit moved off enemy DZE", "points": 3 },
+            { "label": "Objective controlled", "points": 3 },
+            { "label": "Briefcase retrieved", "points": 5 },
+            { "label": "Enemy base destroyed", "points": 5 },
+            { "label": "Strategic objective held", "points": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zone",
+      "name": "Deployment Zones",
+      "shortName": "Zones",
+      "icon": "map",
+      "die": 6,
+      "prompt": "Pick the deployment zones or roll a D6.",
+      "options": [
+        {
+          "id": "long-edges",
+          "name": "Long Edges",
+          "roll": [1, 2, 3],
+          "page": 169,
+          "summary": "The table is split into two halves along its length. Each side deploys along its own long edge, more than 12\" from the table middle line.",
+          "full": [
+            "Split the table into two halves along its length.",
+            "- Both players roll a die. The higher roller picks a deployment zone and the opponent takes the opposite one.",
+            "- Each deployment zone runs along a long table edge and stops more than 12\" short of the table middle line.",
+            "- Your deployment zone edge (DZE) is the long table edge behind your zone."
+          ],
+          "diagram": {
+            "shapes": [
+              { "type": "rect", "side": "a", "x": 0, "y": 0, "w": 72, "h": 12 },
+              { "type": "rect", "side": "b", "x": 0, "y": 36, "w": 72, "h": 12 }
+            ],
+            "lines": [
+              { "x1": 0, "y1": 24, "x2": 72, "y2": 24, "label": "Table middle line" }
+            ],
+            "dims": [
+              { "x1": 60, "y1": 12, "x2": 60, "y2": 24, "label": "12\"" },
+              { "x1": 60, "y1": 24, "x2": 60, "y2": 36, "label": "12\"" }
+            ]
+          }
+        },
+        {
+          "id": "quarters",
+          "name": "Quarters",
+          "roll": [4, 5, 6],
+          "page": 169,
+          "summary": "Each side deploys in diagonally opposite table quarters. Nobody may deploy within 12\" of the centre of the table.",
+          "full": [
+            "Split the table into four quarters.",
+            "- Both players roll a die. The higher roller picks a quarter as their deployment zone and the opponent takes the diagonally opposite one.",
+            "- Nobody may deploy within 12\" of the centre of the table."
+          ],
+          "diagram": {
+            "shapes": [
+              { "type": "rect", "side": "a", "x": 0, "y": 0, "w": 36, "h": 24 },
+              { "type": "rect", "side": "b", "x": 36, "y": 24, "w": 36, "h": 24 },
+              { "type": "circle", "side": "none", "cx": 36, "cy": 24, "r": 12 }
+            ],
+            "lines": [
+              { "x1": 0, "y1": 24, "x2": 72, "y2": 24 },
+              { "x1": 36, "y1": 0, "x2": 36, "y2": 48 }
+            ],
+            "dims": [
+              { "x1": 36, "y1": 24, "x2": 44.49, "y2": 15.51, "label": "12\"" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "type",
+      "name": "Deployment Type",
+      "shortName": "Deployment",
+      "icon": "deploy",
+      "die": 6,
+      "prompt": "Pick the deployment type or roll a D6.",
+      "options": [
+        {
+          "id": "meeting-engagement",
+          "name": "Meeting Engagement",
+          "roll": [1, 2, 3],
+          "page": 170,
+          "summary": "Nothing starts on the table except infiltrators. Up to half your units (rounding down) may wait in reserve. The rest form the first wave and arrive in turn 1.",
+          "full": [
+            "## Declaring reserves",
+            "- Both players roll a die. The higher roller declares first: which units (if any) stay in reserve, which use the Infiltrators rule, and which start mounted in which transport. Then the other player does the same.",
+            "- You may hold up to half your units in reserve, rounding down.",
+            "## Deployment",
+            "- No units are set up before the game, apart from infiltrators.",
+            "- Every unit not held in reserve is part of your first wave.",
+            "## First wave",
+            "- During turn 1, both players must bring their whole first wave onto the table from any point on their own DZE, each unit with a Run or Advance order.",
+            "- First-wave units need no order test to come on, but they can't assault on the turn they arrive."
+          ]
+        },
+        {
+          "id": "prepared-positions",
+          "name": "Prepared Positions",
+          "roll": [4, 5],
+          "page": 170,
+          "summary": "Up to half your units (rounding down) may wait in reserve. The rest set up in your zone one at a time, as order dice come out of the bag.",
+          "full": [
+            "## Declaring reserves",
+            "- Both players roll a die. The higher roller declares first: which units (if any) stay in reserve, which use the Infiltrators rule, and which start mounted in which transport. Then the other player does the same.",
+            "- You may hold up to half your units in reserve, rounding down.",
+            "## Deployment",
+            "- Put one order die in the bag for each unit that isn't in reserve, mounted in a transport or using the Infiltrators rule.",
+            "- Draw dice one at a time. Each time, the owner of the die sets up one unit entirely inside their deployment zone. Keep going until the bag is empty."
+          ]
+        },
+        {
+          "id": "fog-of-war",
+          "name": "Fog of War",
+          "roll": [6],
+          "page": 170,
+          "summary": "At least half your units (rounding up) must start in reserve. The rest deploy as in Prepared Positions. Outflanking isn't allowed, but reserves can enter from any table edge.",
+          "full": [
+            "## Declaring reserves",
+            "- Both players roll a die. The higher roller declares first: which units stay in reserve, which use the Infiltrators rule, and which start mounted in which transport. Then the other player does the same.",
+            "- You **must** hold at least half your units in reserve, rounding up.",
+            "## Deployment",
+            "- Units that aren't in reserve, mounted in a transport or infiltrating set up one at a time from the dice bag, as in Prepared Positions.",
+            "## Reserves",
+            "- Outflanking isn't allowed.",
+            "- Instead, every reserve unit can enter from any point on any table edge you choose."
+          ]
+        }
+      ]
+    }
+  ],
+  "general": [
+    {
+      "id": "setting-up",
+      "name": "Setting up a battle",
+      "icon": "dice",
+      "page": 162,
+      "summary": "Agree a game size (1,000 points is standard) on a 6' × 4' table. Roll for victory conditions, then deployment zones, then deployment type, then play the Start of the Game phase.",
+      "full": [
+        "## Before you roll",
+        "- Agree the game size. 1,000 requisition points per side is the standard game.",
+        "- The standard table is 6' × 4'. On a table 3' wide or less, halve all distances and ranges.",
+        "- Set up terrain. Aim for at least four large pieces that block line of sight, one in each table quarter, plus plenty of lower cover. Agree how each piece works in play.",
+        "## The battle scenario",
+        "- Roll (or choose) the victory conditions, then the deployment zones, then the deployment type. Then play the Start of the Game phase.",
+        "- New to the game? Play the Standard Game: Seek and Destroy, Long Edges and Meeting Engagement, as if you had rolled a 1 on each table.",
+        "## Gathering intelligence",
+        "- Once the scenario is decided, but before anyone picks sides or deploys, agree whether to show each other your forces or keep them secret until turn 1. If you can't agree, roll a die.",
+        "- If forces are kept secret, you only know which army the enemy is using. You won't know what's in reserve or inside transports until it appears."
+      ]
+    },
+    {
+      "id": "game-end",
+      "name": "Game end",
+      "icon": "clock",
+      "page": 163,
+      "summary": "Games last 6 turns. At the end of turn 6 roll a die: on 1–3 the game ends, on 4+ play turn 7. A player who loses all their units loses the game.",
+      "full": [
+        "- Unless the scenario says otherwise, the game lasts six turns.",
+        "- At the end of turn 6, roll a die. On a 3 or less the game ends. On a 4 or more, play turn 7 and then the game ends.",
+        "- Whatever the scenario, a player whose units have all been destroyed loses automatically."
+      ]
+    },
+    {
+      "id": "objectives",
+      "name": "Objectives and buildings",
+      "icon": "target",
+      "page": 164,
+      "summary": "Capture an objective by ending an infantry or artillery unit's activation within 3\" of it, with no enemy unit within 3\". It stays yours until the enemy captures it back.",
+      "full": [
+        "## Capturing",
+        "- One of your infantry or artillery units ends its activation within 3\" of the objective, and no enemy unit of any type is within 3\" of it.",
+        "- A captured objective stays yours until the end of the game or until the enemy captures it back.",
+        "## Buildings as objectives (p. 173)",
+        "- A building can be an objective or a base: put the marker on top. The objective is the ground floor.",
+        "- Control it by occupying the ground floor instead of being within 3\", with no enemy unit within 3\" of the building.",
+        "- If the building is destroyed, put the marker in the centre of the rubble. If it was a base destroyed by a unit inside it, that unit leaves as if from a burning building but takes no damage from the collapse.",
+        "- If the building is on fire, units must be in base contact with it to control the objective.",
+        "## Buildings and deployment (p. 173)",
+        "- Units can deploy on any floor of a building that lies entirely inside their deployment zone.",
+        "- Infiltrators can too, as long as the building is more than 12\" from the Top Secret briefcase, from enemy units and from buildings enemy units occupy."
+      ]
+    },
+    {
+      "id": "reserves",
+      "name": "Reserves",
+      "icon": "deploy",
+      "page": 172,
+      "summary": "In turn 1, reserves can only be ordered Down. From turn 2, give one an Advance or Run order and pass an order test at −1 to bring it on from your DZE. A unit that never arrives counts as destroyed.",
+      "full": [
+        "- Reserves are neither set up at the start nor part of a first wave. Their order dice still go in the bag.",
+        "- In turn 1, a reserve unit can only be given a Down order.",
+        "- From turn 2, you can order a reserve unit onto the table with an Advance or Run order. It must pass an order test at **−1** (a FUBAR just counts as a failure). If it passes, it enters from any point on your DZE.",
+        "- You never have to bring a unit on. Give it a Down order to keep it waiting.",
+        "- Units can't assault on the turn they arrive, and can't leave the table that turn either.",
+        "- A unit that hasn't arrived by the end of the game counts as destroyed (missing in action).",
+        "## Transports, artillery and officers",
+        "- Infantry or artillery can wait in reserve mounted in a transport or tow. Only the transport takes the order test.",
+        "- Artillery that can't move without a tow may wait in reserve (or join the first wave). When it arrives, it makes a single 6\" move onto the table from a point in your deployment zone.",
+        "- Officers' abilities don't work while they're off the table, except on their own transport and the units riding in it.",
+        "- If a unit and its spotter are both in reserve, the unit's first successful Run or Advance order brings both on, at different points if you like."
+      ]
+    },
+    {
+      "id": "outflanking",
+      "name": "Outflanking",
+      "icon": "map",
+      "page": 172,
+      "summary": "Secretly send reserves left or right. They stay Down on turns 1–2. On turns 3–4 they enter from your long edge or the chosen short edge, outside the enemy DZE. From turn 5 they may enter anywhere on those edges.",
+      "full": [
+        "- During deployment, tell your opponent which reserve units are outflanking. Secretly write down whether each one goes left or right, and reveal it only when that unit arrives.",
+        "- Outflanking units must be given Down orders on turns 1 and 2.",
+        "- From turn 3, you can order them on with Advance or Run, using the normal reserve order test at −1.",
+        "- On turn 3 or 4, they enter from any point on the long table edge you sit behind, or anywhere on the chosen short table edge outside the enemy DZE.",
+        "- On turn 5 or later, they can enter anywhere along your long table edge or the chosen short table edge.",
+        "- Fog of War doesn't allow outflanking."
+      ]
+    },
+    {
+      "id": "start-of-game",
+      "name": "Start of the Game phase",
+      "icon": "flag",
+      "page": 174,
+      "summary": "After deployment, infiltrators set up from the dice bag (more than 12\" from enemy units). Then resolve 'at the start of the game' abilities, put every order die back in the bag and begin turn 1.",
+      "full": [
+        "## 1. Infiltrators",
+        "- Infiltrators (spotters, observers, snipers and anyone else with the rule) held in reserve lose their special deployment and act as normal reserves.",
+        "- The others go in the dice bag. Draw dice one at a time; the owner deploys one infiltrator anywhere more than 12\" from any enemy unit already on the table, enemy infiltrators included.",
+        "- If an infiltrating unit uses its special deployment and has a transport, that transport must start in reserve, even in scenarios that don't allow reserves. It can't carry other units while it waits.",
+        "## 2. 'At the start of the game' rules",
+        "- Resolve abilities that trigger at the start of the game, such as free moves. If both sides have some, roll off. The winner decides which player resolves all of theirs first.",
+        "## 3. Collect order dice",
+        "- Put all order dice back in the bag and begin turn 1."
+      ]
+    },
+    {
+      "id": "tiebreakers",
+      "name": "Tie-breakers and attrition",
+      "icon": "trophy",
+      "page": 168,
+      "summary": "Optional. Settle a draw by scoring it as Seek and Destroy: a side 2 VP ahead earns a 'winning draw'. Attrition scoring weights results by points cost, for tournaments.",
+      "full": [
+        "## Tie-breakers",
+        "- To settle a draw, score the game as Seek and Destroy (1 VP per enemy unit destroyed). If one side is at least 2 VP ahead, call it a winning draw, or a minor victory. Otherwise it stays a draw.",
+        "## Victory by attrition",
+        "- For tournaments, multiply each unit's VP value by its points cost. A unit worth 3 VP that cost 100 points scores 300.",
+        "- For objectives, divide the game's points size by the number of objectives (1,000 points with 6 objectives makes about 167 each). Then apply any multiplier, as in Grand Tactical.",
+        "- Where a scenario needs a 2 VP margin, each VP of margin equals 10% of the game size: 200 points in a 1,000-point game."
+      ]
+    }
+  ]
+}

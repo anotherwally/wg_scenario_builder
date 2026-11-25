@@ -1,0 +1,6 @@
+{
+  "systems": [
+    { "id": "bolt-action", "name": "Bolt Action", "shortName": "BA", "file": "data/bolt-action.json" },
+    { "id": "konflikt-47", "name": "Konflikt '47", "shortName": "K47", "file": "data/konflikt-47.json" }
+  ]
+}
