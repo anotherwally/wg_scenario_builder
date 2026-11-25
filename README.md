@@ -4,6 +4,8 @@ A small static web app for setting up **Battle Scenarios** and keeping score in 
 **Bolt Action** (3rd ed.) and **Konflikt '47** (2nd ed.). It's built for phones. It needs no build
 step and no server code, so it runs as-is on GitHub Pages.
 
+**Live site: <https://fieldorders.anotherwally.dev>**
+
 > Unofficial fan-made tool. Not affiliated with Warlord Games.
 
 ## What it does
@@ -34,6 +36,8 @@ data/konflikt-47.json   Konflikt '47 scenario rules
 assets/                 App icons
 sw.js                   Offline cache
 manifest.webmanifest    Home-screen app details
+CNAME                   Custom domain for GitHub Pages (don't delete)
+.nojekyll               Stops GitHub Pages from running Jekyll
 ```
 
 ## Run it locally
@@ -47,15 +51,39 @@ python3 -m http.server 8765
 
 Then open http://localhost:8765.
 
-## Publish on GitHub Pages
+## Hosting
 
-1. Create a repository and push this folder to the `main` branch.
-2. In the repository, go to **Settings → Pages → Build and deployment**. Choose **Deploy from a branch**,
-   with branch `main` and folder `/ (root)`.
-3. After a minute the app is live at `https://<user>.github.io/<repo>/`.
+The site is served by **GitHub Pages** from the `main` branch (folder `/ (root)`) at the custom domain
+**`fieldorders.anotherwally.dev`**. Every push to `main` redeploys it within a minute or two. The old
+address, `https://anotherwally.github.io/wg_scenario_builder/`, redirects to the custom domain.
 
-All paths are relative, so it works from a project sub-path. The `.nojekyll` file stops GitHub from
-running Jekyll over the files.
+### How the custom domain is set up
+
+| Where | Setting |
+| --- | --- |
+| GitHub repo → **Settings → Pages** | Source: *Deploy from a branch*, `main`, `/ (root)`. Custom domain: `fieldorders.anotherwally.dev`. **Enforce HTTPS** on. |
+| `CNAME` file in the repo root | `fieldorders.anotherwally.dev`. GitHub reads the domain from this file, so deleting it turns the custom domain off. |
+| Cloudflare DNS for `anotherwally.dev` | `CNAME` record: name `fieldorders`, target `anotherwally.github.io`, proxy **DNS only** (grey cloud). |
+| Cloudflare DNS for `anotherwally.dev` | `TXT` record `_github-pages-challenge-anotherwally` with the code from GitHub **account** Settings → Pages. This verifies the domain so nobody else can claim its subdomains for their own Pages site. Leave it in place. |
+
+Notes:
+
+- Keep the Cloudflare proxy **off** for the `fieldorders` record. With the orange cloud on, GitHub can't
+  check the domain or renew its HTTPS certificate.
+- `.dev` domains only work over HTTPS. GitHub issues and renews the certificate automatically.
+- If you change the custom domain in the GitHub settings, GitHub commits a new `CNAME` file. Run
+  `git pull --ff-only` before your next push.
+
+### Publishing a copy elsewhere
+
+1. Push this folder to the `main` branch of a GitHub repository.
+2. In **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, with branch `main`
+   and folder `/ (root)`. GitHub Free needs a public repository for this.
+3. Delete or replace the `CNAME` file. Otherwise your copy tries to claim `fieldorders.anotherwally.dev`.
+4. The app is then live at `https://<user>.github.io/<repo>/`, or at your own domain if you set one.
+
+All paths are relative, so the app works both from a project sub-path and at the root of a custom domain.
+The `.nojekyll` file stops GitHub from running Jekyll over the files.
 
 ## Editing the rules data
 
@@ -67,7 +95,7 @@ UI follows.
   "id": "bolt-action",
   "name": "Bolt Action",
   "edition": "Third Edition",
-  "status": "review",             // anything but "verified" shows statusNote as a dismissible banner
+  "status": "verified",           // anything else (e.g. "review") shows statusNote as a dismissible banner
   "statusNote": "…",
   "source": { "book": "Bolt Action Third Edition rulebook", "pages": "162–174" },
   "table": { "width": 72, "height": 48, "label": "6' × 4' table" },   // inches
@@ -134,8 +162,9 @@ After changing which files exist, bump `CACHE` in `sw.js` and update its `CORE` 
 
 The bundled rules are paraphrased from the battle-scenario chapters of the **Bolt Action Third Edition**
 rulebook (pp. 162–174) and the **Konflikt '47 Second Edition** rulebook (pp. 142–153). Each option and
-general rule carries its page number. Both files are in `"review"` status, which shows a dismissible
-notice. Set `"status": "verified"` once you've read them through.
+general rule carries its page number. Both files have been checked against the books and are marked
+`"status": "verified"`, so the app shows no notice. If you make big changes to a file, set its status back
+to `"review"` to show its `statusNote` until it's been checked again.
 
 Main differences between the two systems, reflected in the data:
 

@@ -4,7 +4,7 @@
   "name": "Bolt Action",
   "shortName": "BA",
   "edition": "Third Edition",
-  "status": "review",
+  "status": "verified",
   "statusNote": "Rules paraphrased from the Bolt Action Third Edition rulebook (pp. 162–174). Read them through, then set \"status\" to \"verified\" in data/bolt-action.json to hide this notice.",
   "source": {
     "book": "Bolt Action Third Edition rulebook",

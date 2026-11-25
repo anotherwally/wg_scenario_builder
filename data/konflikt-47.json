@@ -4,7 +4,7 @@
   "name": "Konflikt '47",
   "shortName": "K47",
   "edition": "Second Edition",
-  "status": "review",
+  "status": "verified",
   "statusNote": "Rules paraphrased from the Konflikt '47 Second Edition rulebook (pp. 142–153). Read them through, then set \"status\" to \"verified\" in data/konflikt-47.json to hide this notice.",
   "source": {
     "book": "Konflikt '47 Second Edition rulebook",
