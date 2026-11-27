@@ -126,6 +126,14 @@ function pickedSetting(key, fallback) {
 }
 const winMargin = () => pickedSetting('winMargin', 1);
 const scoreUnit = () => pickedSetting('scoreUnit', 'VP');
+const killVP = () => pickedSetting('killVP', 0); // VP each kill is worth (Seek and Destroy: 1)
+
+// The optional kills tie-breaker, unless the chosen scenario turns it off
+// (Seek and Destroy already scores kills, so a tie-break would just repeat it).
+function tiebreakRule() {
+  const tb = app.data.game?.tiebreak;
+  return tb && pickedSetting('tiebreak', true) !== false ? tb : null;
+}
 
 // The picked option in another category that rules this option out (via "excludes"), if any.
 function blockedBy(opt, catId) {
@@ -307,8 +315,10 @@ function turnCard() {
   let panel = '';
 
   if (g.over) {
+    const tb = tiebreakText();
     panel = `<div class="turn-panel over">
       <p><strong>Battle over.</strong> ${esc(resultText())}</p>
+      ${tb ? `<p class="tb">${icon('crosshair')} ${esc(tb)}</p>` : ''}
       <div class="row">
         <button type="button" class="btn small" data-action="new-game">${icon('reset')} New game</button>
         <button type="button" class="btn small" data-action="resume">Resume</button>
@@ -362,6 +372,7 @@ function playerCard(p, i) {
       <button type="button" class="btn" data-action="score" data-p="${i}" data-d="-1" aria-label="Remove 1 ${esc(unit)} from ${esc(p.name)}">${icon('minus')}</button>
       <button type="button" class="btn" data-action="score" data-p="${i}" data-d="1" aria-label="Add 1 ${esc(unit)} to ${esc(p.name)}">${icon('plus')}</button>
     </div>
+    ${killsRow(p, i)}
     ${quick.length ? `<div class="quick">${quick.map((s) => `
       <button type="button" class="${s.endsGame ? 'ends' : ''}" data-action="score" data-p="${i}" data-d="${+s.points}" data-label="${esc(s.label)}" ${s.endsGame ? 'data-ends="1"' : ''}>
         ${s.endsGame ? icon('trophy') : `<b>${s.points > 0 ? '+' : ''}${+s.points}</b>`}<span>${esc(s.label)}</span>
@@ -369,7 +380,26 @@ function playerCard(p, i) {
   </article>`;
 }
 
-function resultText() {
+// Enemy units destroyed: counted for the tie-breaker, and worth VP in scenarios with "killVP".
+function killsRow(p, i) {
+  const per = killVP();
+  if (!app.data.game?.tiebreak && !per) return '';
+  const kills = p.kills ?? 0;
+  return `<div class="kills">
+    <div class="k-head">
+      <span class="k-label">${icon('crosshair')} Kills</span>
+      ${per ? `<small>+${per} ${esc(scoreUnit())} each</small>` : '<small>tie-break</small>'}
+    </div>
+    <div class="k-ctrl">
+      <button type="button" class="k-btn" data-action="kill" data-p="${i}" data-d="-1" aria-label="Remove a kill from ${esc(p.name)}" ${kills ? '' : 'disabled'}>${icon('minus')}</button>
+      <span class="k-num" aria-live="polite">${kills}</span>
+      <button type="button" class="k-btn" data-action="kill" data-p="${i}" data-d="1" aria-label="${esc(p.name)} destroyed an enemy unit">${icon('plus')}</button>
+    </div>
+  </div>`;
+}
+
+// The main result of the battle, and whether it counts as a draw.
+function outcome() {
   const g = app.state.game;
   const [a, b] = g.players;
 
@@ -377,23 +407,42 @@ function resultText() {
   // battle outright. If both sides did it in the same turn, it's a draw.
   if (g.endedBy) {
     const enders = new Set(g.log.filter((e) => e.ends && e.turn === g.turn).map((e) => e.p));
-    if (enders.size > 1) return 'Draw: both sides did it in the same turn.';
+    if (enders.size > 1) return { draw: true, text: 'Draw: both sides did it in the same turn.' };
     const reason = g.endedBy.label.replace(/\s*\(wins\)\s*$/i, '').toLowerCase();
-    return `${g.players[g.endedBy.p].name} wins (${reason}).`;
+    return { draw: false, text: `${g.players[g.endedBy.p].name} wins (${reason}).` };
   }
 
   const margin = winMargin();
   const diff = Math.abs(a.vp - b.vp);
-  if (diff === 0) return `Draw at ${a.vp}–${b.vp}.`;
+  if (diff === 0) return { draw: true, text: `Draw at ${a.vp}–${b.vp}.` };
   const [w, l] = a.vp > b.vp ? [a, b] : [b, a];
-  if (diff < margin) return `Draw: ${w.name} is only ${diff} ahead and needs ${margin} to win.`;
-  return `${w.name} wins ${w.vp}–${l.vp}.`;
+  if (diff < margin) return { draw: true, text: `Draw: ${w.name} is only ${diff} ahead and needs ${margin} to win.` };
+  return { draw: false, text: `${w.name} wins ${w.vp}–${l.vp}.` };
+}
+
+function resultText() { return outcome().text; }
+
+// Optional rulebook tie-breaker for drawn games: score them as Seek and Destroy.
+function tiebreakText() {
+  const tb = tiebreakRule();
+  if (!tb || !outcome().draw) return '';
+  const [a, b] = app.state.game.players;
+  const ka = a.kills ?? 0;
+  const kb = b.kills ?? 0;
+  if (Math.abs(ka - kb) >= (tb.margin ?? 2)) {
+    const [w, hi, lo] = ka > kb ? [a, ka, kb] : [b, kb, ka];
+    return `Tie-break: ${w.name} takes a winning draw on kills (${hi}–${lo}).`;
+  }
+  return `Tie-break on kills (${ka}–${kb}): still a draw.`;
 }
 
 function standingHtml() {
   const g = app.state.game;
   const [a, b] = g.players;
-  if (g.over) return `${icon('trophy')} ${esc(resultText())}`;
+  if (g.over) {
+    const tb = tiebreakText();
+    return `${icon('trophy')} <span>${esc(resultText())}</span>${tb ? `<small class="tb">${esc(tb)}</small>` : ''}`;
+  }
   if (a.vp === b.vp) return `All square at ${a.vp} ${esc(scoreUnit())}`;
   const margin = winMargin();
   const [lead, diff] = a.vp > b.vp ? [a, a.vp - b.vp] : [b, b.vp - a.vp];
@@ -414,10 +463,22 @@ function logCard() {
         <span class="t">T${e.turn}</span>
         <span class="who p${e.p + 1}">${esc(players[e.p]?.name ?? `Player ${e.p + 1}`)}</span>
         <span class="what">${esc(e.label)}</span>
-        <span class="d">${e.d > 0 ? '+' : ''}${e.d}</span>
+        <span class="d">${logDelta(e, true)}</span>
       </li>`).join('')}</ol>${log.length > shown.length ? `<p class="more">${log.length - shown.length} older entries hidden.</p>` : ''}`
       : '<p class="empty">Score changes will show up here.</p>'}
   </article>`;
+}
+
+// "+3", "+1 kill" or "+1 +1 kill" for a log entry (score change, then kills change).
+function logDelta(e, html = false) {
+  const signed = (n) => `${n > 0 ? '+' : ''}${n}`;
+  const parts = [];
+  if (e.d) parts.push(signed(e.d));
+  if (e.k) {
+    const kills = `${signed(e.k)} kill${Math.abs(e.k) === 1 ? '' : 's'}`;
+    parts.push(html ? `<small>${kills}</small>` : kills);
+  }
+  return parts.join(' ') || '0';
 }
 
 /* ---------- Rules view ---------- */
@@ -531,6 +592,30 @@ function score(p, d, label, ends) {
   if (entry.ends) toast(`Battle over: ${resultText()}`);
 }
 
+// Record an enemy unit destroyed (or remove one). In scenarios where kills
+// score VP (Seek and Destroy, Grand Tactical) the VP follow automatically.
+function addKill(p, dk) {
+  const g = app.state.game;
+  const player = g.players[p];
+  const before = player.kills ?? 0;
+  const after = Math.max(0, before + dk);
+  const k = after - before;
+  if (!k) return;
+  player.kills = after;
+  let d = 0;
+  const per = killVP();
+  if (per) {
+    const vp = Math.max(0, player.vp + k * per);
+    d = vp - player.vp;
+    player.vp = vp;
+  }
+  g.log.unshift({ p, d, k, label: k > 0 ? 'Enemy unit destroyed' : 'Kill removed', turn: g.turn });
+  if (g.log.length > 200) g.log.length = 200;
+  buzz();
+  save();
+  render();
+}
+
 const actions = {
   system: ({ id }) => switchSystem(id),
 
@@ -608,19 +693,22 @@ const actions = {
 
   score: ({ p, d, label, ends }) => score(Number(p), Number(d), label, ends === '1'),
 
+  kill: ({ p, d }) => addKill(Number(p), Number(d)),
+
   undo: () => {
     const g = app.state.game;
     const e = g.log.shift();
     if (!e) return;
     const player = g.players[e.p];
-    player.vp = Math.max(0, player.vp - e.d);
+    player.vp = Math.max(0, player.vp - (e.d ?? 0));
+    if (e.k) player.kills = Math.max(0, (player.kills ?? 0) - e.k);
     if (e.ends && !g.log.some((x) => x.ends)) {
       g.over = false;
       g.endedBy = null;
     }
     save();
     render();
-    toast(`Undid ${e.d > 0 ? '+' : ''}${e.d} for ${player.name}`);
+    toast(`Undid ${logDelta(e)} for ${player.name}`);
   },
 
   'new-game': () => {

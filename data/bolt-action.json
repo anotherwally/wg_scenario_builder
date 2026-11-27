@@ -18,6 +18,11 @@
       "on": 4,
       "turns": 1,
       "summary": "End of turn 6: roll a die. On 1–3 the game ends, on 4+ play turn 7."
+    },
+    "tiebreak": {
+      "margin": 2,
+      "page": 168,
+      "summary": "Optional tie-breaker: score a drawn game as Seek and Destroy. A side with at least 2 more enemy units destroyed takes a winning draw (minor victory)."
     }
   },
   "categories": [
@@ -44,9 +49,9 @@
             "- Any smaller margin is a draw."
           ],
           "winMargin": 2,
-          "scoring": [
-            { "label": "Enemy unit destroyed", "points": 1 }
-          ]
+          "killVP": 1,
+          "tiebreak": false,
+          "scoring": []
         },
         {
           "id": "key-positions",
@@ -199,8 +204,8 @@
             "- A side with **at least 2 VP more** than the other wins a clear victory. Otherwise it's a draw."
           ],
           "winMargin": 2,
+          "killVP": 1,
           "scoring": [
-            { "label": "Enemy unit destroyed", "points": 1 },
             { "label": "Unit in enemy zone at end", "points": 1 },
             { "label": "Unit moved off enemy DZE", "points": 3 },
             { "label": "Objective controlled", "points": 3 },
