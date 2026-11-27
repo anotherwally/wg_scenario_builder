@@ -36,8 +36,9 @@ data/konflikt-47.json   Konflikt '47 scenario rules
 assets/                 App icons
 sw.js                   Offline cache
 manifest.webmanifest    Home-screen app details
-CNAME                   Custom domain for GitHub Pages (don't delete)
-.nojekyll               Stops GitHub Pages from running Jekyll
+.github/workflows/      Deploys the site to GitHub Pages when a version tag is pushed
+CNAME                   Custom domain record (ignored by the Actions deploy; see Hosting)
+.nojekyll               Stops Jekyll on branch deploys (not needed by the Actions deploy)
 ```
 
 ## Run it locally
@@ -53,16 +54,48 @@ Then open http://localhost:8765.
 
 ## Hosting
 
-The site is served by **GitHub Pages** from the `main` branch (folder `/ (root)`) at the custom domain
-**`fieldorders.anotherwally.dev`**. Every push to `main` redeploys it within a minute or two. The old
-address, `https://anotherwally.github.io/wg_scenario_builder/`, redirects to the custom domain.
+The site is served by **GitHub Pages** at the custom domain **`fieldorders.anotherwally.dev`**. What is
+live is the **latest version tag** (`v*`), not the tip of `main`. Pushing a tag runs
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml), which checks out that tag and publishes
+it. Pushes to `main` do not deploy. The old address, `https://anotherwally.github.io/wg_scenario_builder/`,
+redirects to the custom domain.
+
+### Releasing a new version
+
+Merge your changes to `main`, then tag the merge commit and push the tag:
+
+```bash
+git checkout main && git pull --ff-only
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+The **Actions** tab shows the deploy, and the site updates within a minute or two of it finishing.
+Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` deploys.
+
+- **Roll back:** open the Actions run of the older tag and choose **Re-run all jobs**. That deploys the
+  older tag's code again.
+- Create tags only from commits that already contain the workflow file. A tag on an older commit has
+  nothing to run, so it won't deploy.
+
+### One-time GitHub setup
+
+Do these in the repo's **Settings** before pushing the first tag:
+
+1. **Pages → Build and deployment → Source:** choose **GitHub Actions**.
+2. **Environments → `github-pages` → Deployment branches and tags:** add a **tag** rule `v*`. The
+   environment starts out allowing only the default branch, so without this rule a tag deploy fails with
+   *"Tag is not allowed to deploy to github-pages due to environment protection rules"*. Remove the
+   `main` rule to make tags the only way to deploy.
+3. **Pages → Custom domain:** confirm it still says `fieldorders.anotherwally.dev` (re-enter it if it was
+   cleared) and that **Enforce HTTPS** is on.
 
 ### How the custom domain is set up
 
 | Where | Setting |
 | --- | --- |
-| GitHub repo → **Settings → Pages** | Source: *Deploy from a branch*, `main`, `/ (root)`. Custom domain: `fieldorders.anotherwally.dev`. **Enforce HTTPS** on. |
-| `CNAME` file in the repo root | `fieldorders.anotherwally.dev`. GitHub reads the domain from this file, so deleting it turns the custom domain off. |
+| GitHub repo → **Settings → Pages** | Source: *GitHub Actions*. Custom domain: `fieldorders.anotherwally.dev`. **Enforce HTTPS** on. |
+| `CNAME` file in the repo root | `fieldorders.anotherwally.dev`. The Actions deploy ignores this file, and the domain comes from the Pages setting above. It is kept so the domain is recorded in the repo and a switch back to branch deploys keeps working. |
 | Cloudflare DNS for `anotherwally.dev` | `CNAME` record: name `fieldorders`, target `anotherwally.github.io`, proxy **DNS only** (grey cloud). |
 | Cloudflare DNS for `anotherwally.dev` | `TXT` record `_github-pages-challenge-anotherwally` with the code from GitHub **account** Settings → Pages. This verifies the domain so nobody else can claim its subdomains for their own Pages site. Leave it in place. |
 
@@ -71,19 +104,20 @@ Notes:
 - Keep the Cloudflare proxy **off** for the `fieldorders` record. With the orange cloud on, GitHub can't
   check the domain or renew its HTTPS certificate.
 - `.dev` domains only work over HTTPS. GitHub issues and renews the certificate automatically.
-- If you change the custom domain in the GitHub settings, GitHub commits a new `CNAME` file. Run
-  `git pull --ff-only` before your next push.
+- With the Actions deploy, changing the custom domain in the GitHub settings does not commit a `CNAME`
+  file. Update the file by hand if you want the repo to keep matching.
 
 ### Publishing a copy elsewhere
 
-1. Push this folder to the `main` branch of a GitHub repository.
-2. In **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, with branch `main`
-   and folder `/ (root)`. GitHub Free needs a public repository for this.
-3. Delete or replace the `CNAME` file. Otherwise your copy tries to claim `fieldorders.anotherwally.dev`.
-4. The app is then live at `https://<user>.github.io/<repo>/`, or at your own domain if you set one.
+1. Push this folder to a GitHub repository. GitHub Free needs a public repository for Pages.
+2. In **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source.
+3. Add the `v*` tag rule to the `github-pages` environment (see *One-time GitHub setup* above).
+4. Delete or replace the `CNAME` file so your copy doesn't point at `fieldorders.anotherwally.dev`.
+5. Push a version tag such as `v1.0.0`. The app is then live at `https://<user>.github.io/<repo>/`, or at
+   your own domain if you set one in **Settings → Pages**.
 
 All paths are relative, so the app works both from a project sub-path and at the root of a custom domain.
-The `.nojekyll` file stops GitHub from running Jekyll over the files.
+The workflow publishes everything in the repo root except hidden files and this README.
 
 ## Editing the rules data
 

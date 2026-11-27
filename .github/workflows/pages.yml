@@ -1,0 +1,49 @@
+name: Deploy Pages on version tag
+
+# The live site is whatever the most recent `v*` tag points at. Pushing to main
+# does not deploy. To release:  git tag v1.2.3 && git push origin v1.2.3
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time. A second tag queues instead of cancelling a deploy
+# that is already in flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # On a tag push this checks out the tagged commit.
+      - uses: actions/checkout@v7
+
+      # There is no build step: the repo root is the site. Copy it into _site,
+      # leaving out the files that are not part of the app.
+      - name: Stage site files
+        run: |
+          mkdir _site
+          rsync -a \
+            --exclude='/_site' \
+            --exclude='.*' \
+            --exclude='/README.md' \
+            ./ _site/
+          test -f _site/index.html
+          echo "Files to publish:"
+          find _site -type f | sort
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
