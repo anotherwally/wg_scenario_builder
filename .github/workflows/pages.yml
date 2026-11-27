@@ -1,11 +1,17 @@
 name: Deploy Pages on version tag
 
 # The live site is the most recently deployed `v*` tag. Pushing to main does not
+# deploy, a pre-release tag (one with a hyphen, like v1.3.0-rc.1) does not
 # deploy, and a tag only deploys if its commit is on main (see the guard step
 # below). To release:  git tag v1.2.3 && git push origin v1.2.3
 on:
   push:
-    tags: ['v*']
+    tags:
+      - 'v*'
+      # Skip pre-releases: any tag with a hyphen, as in semver (v1.3.0-rc.1,
+      # v1.3.0-beta). This must stay after 'v*', because a later negative pattern
+      # removes the tags an earlier positive pattern matched.
+      - '!v*-*'
 
 permissions:
   contents: read
