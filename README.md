@@ -55,7 +55,7 @@ Then open http://localhost:8765.
 ## Hosting
 
 The site is served by **GitHub Pages** at the custom domain **`fieldorders.anotherwally.dev`**. What is
-live is the **latest version tag** (`v*`), not the tip of `main`. Pushing a tag runs
+live is the **most recently deployed version tag** (`v*`), not the tip of `main`. Pushing a tag runs
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which checks out that tag and publishes
 it. Pushes to `main` do not deploy. The old address, `https://anotherwally.github.io/wg_scenario_builder/`,
 redirects to the custom domain.
@@ -71,12 +71,40 @@ git push origin v1.2.3
 ```
 
 The **Actions** tab shows the deploy, and the site updates within a minute or two of it finishing.
-Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` deploys.
+Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` deploys. Create tags only from commits that
+already contain the workflow file. A tag on an older commit has nothing to run, so it won't deploy.
 
-- **Roll back:** open the Actions run of the older tag and choose **Re-run all jobs**. That deploys the
-  older tag's code again.
-- Create tags only from commits that already contain the workflow file. A tag on an older commit has
-  nothing to run, so it won't deploy.
+### Rolling back a bad release
+
+The live site is whichever tag the workflow deployed **most recently**. There is no "highest version wins"
+rule, so a rollback is just a deploy of known-good code. You don't need to touch `main` first, so you can
+recover quickly and fix the code afterwards.
+
+**Option 1: re-run the last good deploy (fastest)**
+
+1. Open the **Actions** tab and find the successful run for the last good tag.
+2. Click **Re-run all jobs**.
+
+This checks out that tag again and publishes it over the broken release. It needs the tag to still exist
+and the run to be recent. GitHub allows re-runs for about 30 days after the original run.
+
+**Option 2: tag known-good code with a new version**
+
+This works at any time, even when the old run is gone. If `v1.2.3` is the broken release:
+
+```bash
+git tag v1.2.4 <good-commit-sha>
+git push origin v1.2.4
+```
+
+Or revert the bad change in a PR to `main` and tag the revert. The good commit must already contain the
+workflow file, or the tag won't deploy.
+
+Leave the broken tag where it is. Deleting or moving tags makes the history hard to follow.
+
+**What visitors see.** The service worker (`sw.js`) fetches from the network first, so online visitors
+get the rolled-back version on their next load. Offline visitors keep their cached copy until they are
+back online. A hard refresh clears anything that looks stale.
 
 ### One-time GitHub setup
 
