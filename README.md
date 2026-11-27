@@ -13,7 +13,7 @@ step and no server code, so it runs as-is on GitHub Pages.
 | Tab | Purpose |
 | --- | --- |
 | **Scenario** | Pick or roll (D6) the **victory conditions**, **deployment zones** and **deployment type**. A table map shows the zones, the objective markers and the player names. Each option shows a short summary, and you can expand it to read the full rules. |
-| **Battle** | Turn counter (6 turns, with the roll for turn 7), VP for both players with quick-score buttons from the chosen victory conditions, a battle log with undo, and the final result. |
+| **Battle** | Turn counter (6 turns, with the roll for turn 7), VP for both players with quick-score buttons from the chosen victory conditions, a **kill counter** per player, a battle log with undo, and the final result. Drawn games show the rulebook's optional **kills tie-breaker**: 2 or more kills ahead is a winning draw. |
 | **Rules** | Reference for the current battle and the general rules, with a **Summary / Full** toggle. |
 
 - Switch between **BA** and **K47** in the top bar. Each system remembers its own scenario picks.
@@ -101,7 +101,8 @@ UI follows.
   "table": { "width": 72, "height": 48, "label": "6' × 4' table" },   // inches
   "game": {
     "turns": 6,
-    "extraTurn": { "die": 6, "on": 4, "turns": 1, "summary": "…" }   // omit to disable
+    "extraTurn": { "die": 6, "on": 4, "turns": 1, "summary": "…" },  // omit to disable
+    "tiebreak": { "margin": 2, "page": 168, "summary": "…" }          // kills tie-breaker for draws; omit to hide the kill counter
   },
   "categories": [                 // the three scenario tables
     {
@@ -125,6 +126,8 @@ UI follows.
           ],
           "winMargin": 1,         // lead needed to win; less is a draw (Seek and Destroy uses 2)
           "scoreUnit": "VP",      // label on the score counter, e.g. "Obj" for Key Positions
+          "killVP": 1,            // VP added per kill on the kill counter (Seek and Destroy, Grand Tactical)
+          "tiebreak": false,      // turn the kills tie-breaker off (Seek and Destroy, which already scores kills)
           "excludes": ["fog-of-war"],  // option ids in other tables this rules out (re-rolled)
           "markers": [ { "x": 36, "y": 24, "label": "Briefcase", "ring": 12 } ]  // map marker + no-deploy ring
         }

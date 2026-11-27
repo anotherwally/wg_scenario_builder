@@ -11,8 +11,9 @@ export function newGame(players) {
     extraRoll: null, // die result of the extra-turn roll, or null
     over: false,
     endedBy: null, // { p, label } when a game-ending event (e.g. briefcase off the table) ended it
-    players: source.map((p, i) => ({ name: p.name || `Player ${i + 1}`, vp: 0 })),
-    log: [], // newest first: { p, d, label, turn }
+    // kills = enemy units this player destroyed (for Seek and Destroy and the tie-breaker)
+    players: source.map((p, i) => ({ name: p.name || `Player ${i + 1}`, vp: 0, kills: 0 })),
+    log: [], // newest first: { p, d (score change), k (kills change), label, turn, ends? }
   };
 }
 
@@ -38,6 +39,8 @@ export function loadState() {
     const playersOk = Array.isArray(game.players) && game.players.length === 2
       && game.players.every((p) => p && typeof p.name === 'string' && Number.isFinite(p.vp));
     if (!playersOk) game.players = base.game.players;
+    // Games saved before the kill counter existed start at 0 kills.
+    for (const p of game.players) if (!Number.isInteger(p.kills) || p.kills < 0) p.kills = 0;
     if (!Array.isArray(game.log)) game.log = [];
     if (!Number.isInteger(game.turn) || game.turn < 1) game.turn = 1;
 
