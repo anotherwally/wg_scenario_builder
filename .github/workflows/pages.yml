@@ -1,7 +1,8 @@
 name: Deploy Pages on version tag
 
-# The live site is whatever the most recent `v*` tag points at. Pushing to main
-# does not deploy. To release:  git tag v1.2.3 && git push origin v1.2.3
+# The live site is the most recently deployed `v*` tag. Pushing to main does not
+# deploy, and a tag only deploys if its commit is on main (see the guard step
+# below). To release:  git tag v1.2.3 && git push origin v1.2.3
 on:
   push:
     tags: ['v*']
@@ -24,8 +25,28 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # On a tag push this checks out the tagged commit.
+      # On a tag push this checks out the tagged commit. fetch-depth 0 pulls the
+      # full history of every branch, which the guard below needs in order to tell
+      # whether the tagged commit is part of main.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Guard: refuse to deploy a tag that is not on main, such as one pushed from
+      # an unmerged feature branch. The run fails here and nothing is published.
+      - name: Require the tagged commit to be on main
+        run: |
+          git rev-parse --verify --quiet origin/main > /dev/null || {
+            echo "::error title=Cannot check the tag::origin/main was not found in the checkout."
+            exit 1
+          }
+          commit=$(git rev-parse HEAD)
+          if git merge-base --is-ancestor "$commit" origin/main; then
+            echo "$GITHUB_REF_NAME ($commit) is on main. Continuing."
+          else
+            echo "::error title=Tag is not on main::$GITHUB_REF_NAME points at $commit, which is not in the history of main. Merge the change to main, then tag the merge commit."
+            exit 1
+          fi
 
       # There is no build step: the repo root is the site. Copy it into _site,
       # leaving out the files that are not part of the app.

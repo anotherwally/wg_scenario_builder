@@ -57,8 +57,8 @@ Then open http://localhost:8765.
 The site is served by **GitHub Pages** at the custom domain **`fieldorders.anotherwally.dev`**. What is
 live is the **most recently deployed version tag** (`v*`), not the tip of `main`. Pushing a tag runs
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which checks out that tag and publishes
-it. Pushes to `main` do not deploy. The old address, `https://anotherwally.github.io/wg_scenario_builder/`,
-redirects to the custom domain.
+it. Pushes to `main` do not deploy, and the workflow refuses any tag whose commit isn't on `main`. The
+old address, `https://anotherwally.github.io/wg_scenario_builder/`, redirects to the custom domain.
 
 ### Releasing a new version
 
@@ -71,8 +71,12 @@ git push origin v1.2.3
 ```
 
 The **Actions** tab shows the deploy, and the site updates within a minute or two of it finishing.
-Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` deploys. Create tags only from commits that
-already contain the workflow file. A tag on an older commit has nothing to run, so it won't deploy.
+Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` starts the workflow. Create tags only from
+commits on `main` that already contain the workflow file:
+
+- A tag on a commit that isn't in `main`'s history, such as one on an unmerged feature branch, starts the
+  workflow but fails at its first check. Nothing is published, and the run's error says why.
+- A tag on a commit from before the workflow existed has nothing to run, so it won't deploy.
 
 ### Rolling back a bad release
 
@@ -97,8 +101,8 @@ git tag v1.2.4 <good-commit-sha>
 git push origin v1.2.4
 ```
 
-Or revert the bad change in a PR to `main` and tag the revert. The good commit must already contain the
-workflow file, or the tag won't deploy.
+Or revert the bad change in a PR to `main` and tag the revert. The good commit must be on `main` and
+already contain the workflow file, or the tag won't deploy.
 
 Leave the broken tag where it is. Deleting or moving tags makes the history hard to follow.
 
