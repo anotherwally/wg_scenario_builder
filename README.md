@@ -71,12 +71,18 @@ git push origin v1.2.3
 ```
 
 The **Actions** tab shows the deploy, and the site updates within a minute or two of it finishing.
-Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` starts the workflow. Create tags only from
-commits on `main` that already contain the workflow file:
+Use `vMAJOR.MINOR.PATCH` names. Any tag that starts with `v` starts the workflow, except pre-release tags
+(see below). Create tags only from commits on `main` that already contain the workflow file:
 
 - A tag on a commit that isn't in `main`'s history, such as one on an unmerged feature branch, starts the
   workflow but fails at its first check. Nothing is published, and the run's error says why.
 - A tag on a commit from before the workflow existed has nothing to run, so it won't deploy.
+
+**Pre-releases don't deploy.** A tag with a hyphen, such as `v1.3.0-rc.1` or `v1.3.0-beta`, counts as a
+pre-release. The workflow ignores it, so no run appears in the Actions tab and the site doesn't change.
+This goes by the tag name, not by the *Set as pre-release* checkbox on a GitHub release. A tag named
+`v1.3.0` deploys even if you tick the box, and a hyphenated tag never deploys even if you don't. When
+you're ready to ship, tag the same commit with the plain name, `v1.3.0`.
 
 ### Rolling back a bad release
 
